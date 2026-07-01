@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket Monitor</title>
+     <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Norge vs Brasil</h1>
+
+    <h2 id="status">Laster...</h2>
+
+    <p id="time"></p>
+
+<script>
+
+const alarm = new Audio("alarm.mp3");
+
+async function updateStatus() {
+
+    const response = await fetch("/status");
+
+    const data = await response.json();
+
+    if (previousSoldOut && !data.soldOut)
+    {
+        alarm.play();
+        alert("🚨 LEDIGE BILLETTER!");
+    }
+
+previousSoldOut = data.soldOut;
+
+    if (data.soldOut) {
+
+        document.getElementById("status").innerHTML =
+            "❌ UTSOLGT";
+            status.style.color = "red";
+
+    }
+    else {
+
+        document.getElementById("status").innerHTML =
+            "🚨 LEDIGE BILLETTER!";
+            status.style.color = "green";
+
+    }
+
+    document.getElementById("time").innerHTML =
+        "Sist sjekket: "
+        + new Date(data.checkedAt).toLocaleTimeString();
+
+}
+
+let previousSoldOut = true;
+
+updateStatus();
+
+setInterval(updateStatus, 10000);
+
+</script>
+
+</body>
+</html>
