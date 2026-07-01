@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="no">
+
 <head>
     <meta charset="UTF-8">
     <title>Ticket Monitor</title>
-     <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <h1>Norge vs Brasil</h1>
@@ -13,52 +16,48 @@
 
     <p id="time"></p>
 
-<script>
+    <script>
 
-const alarm = new Audio("alarm.mp3");
+        let previousSoldOut = true;
 
-async function updateStatus() {
+        async function updateStatus() {
 
-    const response = await fetch("/status");
+            const response = await fetch("/status");
+            const data = await response.json();
 
-    const data = await response.json();
+            if (previousSoldOut && !data.soldOut) {
+                alert("🚨 LEDIGE BILLETTER!");
+            }
 
-    if (previousSoldOut && !data.soldOut)
-    {
-        alarm.play();
-        alert("🚨 LEDIGE BILLETTER!");
-    }
+            previousSoldOut = data.soldOut;
 
-previousSoldOut = data.soldOut;
+            const status = document.getElementById("status");
 
-    if (data.soldOut) {
+            if (data.soldOut) {
 
-        document.getElementById("status").innerHTML =
-            "❌ UTSOLGT";
-            status.style.color = "red";
+                status.innerHTML = "❌ UTSOLGT";
+                status.style.color = "red";
 
-    }
-    else {
+            }
+            else {
 
-        document.getElementById("status").innerHTML =
-            "🚨 LEDIGE BILLETTER!";
-            status.style.color = "green";
+                status.innerHTML = "🚨 LEDIGE BILLETTER!";
+                status.style.color = "green";
 
-    }
+            }
 
-    document.getElementById("time").innerHTML =
-        "Sist sjekket: "
-        + new Date(data.checkedAt).toLocaleTimeString();
+            document.getElementById("time").innerHTML =
+                "Sist sjekket: " +
+                new Date(data.checkedAt).toLocaleTimeString();
 
-}
+        }
 
-let previousSoldOut = true;
+        updateStatus();
 
-updateStatus();
+        setInterval(updateStatus, 10000);
 
-setInterval(updateStatus, 10000);
-
-</script>
+    </script>
 
 </body>
+
 </html>
